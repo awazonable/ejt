@@ -1,0 +1,248 @@
+{
+    "MN": {
+        "name": "mei",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "mei/mei_normal.htsvoice"
+    },
+    "MA": {
+        "name": "mei",
+        "type": "openjtalk",
+        "style": "angry",
+        "addr": "mei/mei_angry.htsvoice"
+    },
+    "MH": {
+        "name": "mei",
+        "type": "openjtalk",
+        "style": "happy",
+        "addr": "mei/mei_happy.htsvoice"
+    },
+    "MS": {
+        "name": "mei",
+        "type": "openjtalk",
+        "style": "sad",
+        "addr": "mei/mei_sad.htsvoice"
+    },
+    "MB": {
+        "name": "mei",
+        "type": "openjtalk",
+        "style": "bashful",
+        "addr": "mei/mei_bashful.htsvoice"
+    },
+    "NI": {
+        "name": "nitech_jp_atr503_m001",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "nitech_jp_atr503_m001.htsvoice"
+    },
+    "TA": {
+        "name": "tohoku",
+        "type": "openjtalk",
+        "style": "angry",
+        "addr": "htsvoice-tohoku-f01-master/tohoku-f01-angry.htsvoice"
+    },
+    "TH": {
+        "name": "tohoku",
+        "type": "openjtalk",
+        "style": "happy",
+        "addr": "htsvoice-tohoku-f01-master/tohoku-f01-happy.htsvoice"
+    },
+    "TN": {
+        "name": "tohoku",
+        "type": "openjtalk",
+        "style": "neutral",
+        "addr": "htsvoice-tohoku-f01-master/tohoku-f01-neutral.htsvoice"
+    },
+    "TS": {
+        "name": "tohoku",
+        "type": "openjtalk",
+        "style": "sad",
+        "addr": "htsvoice-tohoku-f01-master/tohoku-f01-sad.htsvoice"
+    },
+    "A01": {
+        "name": "20代男性01",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/20代男性01.htsvoice"
+    },
+    "A02": {
+        "name": "なないろニジ",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/なないろニジ.htsvoice"
+    },
+    "A03": {
+        "name": "カマ声ギル子",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/カマ声ギル子.htsvoice"
+    },
+    "A04": {
+        "name": "グリマルキン_1.0",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/グリマルキン_1.0.htsvoice"
+    },
+    "A05": {
+        "name": "スランキ",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/スランキ.htsvoice"
+    },
+    "A06": {
+        "name": "ワタシ",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/ワタシ.htsvoice"
+    },
+    "A07": {
+        "name": "京歌カオル",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/京歌カオル.htsvoice"
+    },
+    "A08": {
+        "name": "句音コノ。",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/句音コノ。.htsvoice"
+    },
+    "A09": {
+        "name": "和音シバ",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/和音シバ.htsvoice"
+    },
+    "A10": {
+        "name": "唱地ヨエ",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/唱地ヨエ.htsvoice"
+    },
+    "A11": {
+        "name": "天月りよん",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/天月りよん.htsvoice"
+    },
+    "A12": {
+        "name": "想音いくと",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/想音いくと.htsvoice"
+    },
+    "A13": {
+        "name": "想音いくる",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/想音いくる.htsvoice"
+    },
+    "A14": {
+        "name": "戯歌ラカン",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/戯歌ラカン.htsvoice"
+    },
+    "A15": {
+        "name": "月音ラミ_1.0",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/月音ラミ_1.0.htsvoice"
+    },
+    "A16": {
+        "name": "松尾P",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/松尾P.htsvoice"
+    },
+    "A17": {
+        "name": "桃音モモ",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/桃音モモ.htsvoice"
+    },
+    "A18": {
+        "name": "沙音ほむ",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/沙音ほむ.htsvoice"
+    },
+    "A19": {
+        "name": "獣音ロウ",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/獣音ロウ.htsvoice"
+    },
+    "A20": {
+        "name": "瑞歌ミズキ_Talk",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/瑞歌ミズキ_Talk.htsvoice"
+    },
+    "A21": {
+        "name": "白狐舞",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/白狐舞.htsvoice"
+    },
+    "A22": {
+        "name": "空唄カナタ",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/空唄カナタ.htsvoice"
+    },
+    "A23": {
+        "name": "緋惺",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/緋惺.htsvoice"
+    },
+    "A24": {
+        "name": "能民音ソウ",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/能民音ソウ.htsvoice"
+    },
+    "A25": {
+        "name": "蒼歌ネロ",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/蒼歌ネロ.htsvoice"
+    },
+    "A26": {
+        "name": "薪宮風季",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/薪宮風季.htsvoice"
+    },
+    "A27": {
+        "name": "誠音コト",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/誠音コト.htsvoice"
+    },
+    "A28": {
+        "name": "遊音一莉",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/遊音一莉.htsvoice"
+    },
+    "A29": {
+        "name": "遠藤愛",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/遠藤愛.htsvoice"
+    },
+    "A30": {
+        "name": "闇夜 桜_1.0",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/闇夜 桜_1.0.htsvoice"
+    },
+    "A31": {
+        "name": "飴音わめあ",
+        "type": "openjtalk",
+        "style": "normal",
+        "addr": "akihiro/飴音わめあ.htsvoice"
+    }
+}

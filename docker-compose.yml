@@ -1,0 +1,9 @@
+version: '3'
+services:
+  notebook:
+    build: .
+    environment: 
+      DISCORD_TOKEN: ${DISCORD_TOKEN}
+      VOICEVOX_API_KEY: ${VOICEVOX_API_KEY}
+      DEBUG: 1
+    restart: always
