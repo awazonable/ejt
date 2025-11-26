@@ -2,6 +2,15 @@
 from discord.ext import commands
 from discord import Intents
 import os
+import logging
+
+# ログ設定
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 DISCORD_TOKEN = os.environ.get('DISCORD_TOKEN')
 COMMAND_PREFIX = '~'
