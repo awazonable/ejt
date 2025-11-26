@@ -13,7 +13,25 @@ class Guild():
         self.guild_id = int(guild_id)
         self.db = sqlite3.connect('guilds.db')
         self.c = self.db.cursor()
+        self._init_db()
 
+    def _init_db(self):
+        '''データベースのテーブルを初期化'''
+        self.c.execute('''
+            CREATE TABLE IF NOT EXISTS voice_channel (
+                id INTEGER PRIMARY KEY,
+                channel INTEGER
+            )
+        ''')
+        self.c.execute('''
+            CREATE TABLE IF NOT EXISTS monitoring_channels (
+                id INTEGER,
+                channel INTEGER,
+                PRIMARY KEY (id, channel)
+            )
+        ''')
+        self.db.commit()
+    
     def __del__(self):
         self.c.close()
 

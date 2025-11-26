@@ -70,15 +70,21 @@ class Voicevox():
             "accept": "audio/wav",
         }
         self.logger.info(url)
-        # try:
-        with requests.post(url, headers=headers, timeout=60) as res:
-            if res.status_code == 200:
-                with open(self.file_name, 'wb') as file:
-                    file.write(res.content)
-                return True
-            else:
-                self.logger.error('Http error. Skip download.'+str(res))
-        return False
+        try:
+            with requests.post(url, headers=headers, timeout=60) as res:
+                if res.status_code == 200:
+                    # ディレクトリが存在しない場合は作成
+                    os.makedirs(os.path.dirname(self.file_name), exist_ok=True)
+                    with open(self.file_name, 'wb') as file:
+                        file.write(res.content)
+                    self.logger.info(f"Audio file saved: {self.file_name}")
+                    return True
+                else:
+                    self.logger.error('Http error. Skip download.'+str(res))
+            return False
+        except Exception as e:
+            self.logger.error(f"Error in get_wav_api: {type(e).__name__}: {e}", exc_info=True)
+            return False
         # except Exception as e:
         #     print(f"Error at voicevox: {e}")
         #     return False

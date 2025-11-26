@@ -161,3 +161,21 @@ cython_debug/
 
 guilds.db
 setting.json
+
+# 音声モデルデータ（権利上GitHubにアップロード不可）
+app/hts_voice/
+hts_voice/
+
+# OpenJTalk辞書データ（権利上GitHubにアップロード不可）
+app/openjtalk/open_jtalk_dic_utf_8-1.10/
+open_jtalk_dic_utf_8-1.10/
+
+# 生成された音声ファイル
+app/src/
+src/
+*.wav
+*.mp3
+*.txt
+
+# 一時ファイル
+*.txt

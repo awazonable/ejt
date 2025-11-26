@@ -9,6 +9,7 @@ import json
 import random
 import queue
 import math
+import logging
 
 from bs4 import BeautifulSoup
 import requests
@@ -23,9 +24,13 @@ import guild
 import deepl
 from openjtalk import openjtalk
 
+logger = logging.getLogger(__name__)
+
 CONNECTIN_TIME_OUT = 30
 DOWNLOAD_SAVE_DIR='app/src'
-SETTING_FILE='/app/setting.json'
+# ローカル環境用のパス（Docker環境では/app/setting.json）
+# app/voice.py から見て、プロジェクトルートのsetting.jsonを指す
+SETTING_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'setting.json')
 
 class Voice(commands.Cog):
     VOICE_SETTINGS = {
@@ -64,28 +69,34 @@ class Voice(commands.Cog):
                 await vc.disconnect()
 
     async def play(self, url, guild_id):
+        logger.info(f"play() called: url={url}, guild_id={guild_id}")
         data = guild.Guild(guild_id).get()
-        print('try to play music')
+        logger.info(f"Guild data: voice_channel={data.voice_channel}")
         if data.voice_channel:
             channel = self.bot.get_channel(data.voice_channel)
             if channel:
+                logger.info(f"Found voice channel: {channel.name} (ID: {channel.id})")
                 try:
                     await channel.connect(reconnect=False)
+                    logger.info("Connected to voice channel")
                     if not guild_id in self.queue:
                         self.queue
-                except discord.ClientException:
+                except discord.ClientException as e:
+                    logger.debug(f"Already connected to voice channel: {e}")
                     pass
                 except Exception as e:
-                    return print(e)
+                    logger.error(f"Error connecting to voice channel: {type(e).__name__}: {e}", exc_info=True)
+                    return
                 finally:
                     for vc in self.bot.voice_clients:
                         if vc.guild.id == guild_id:
+                            logger.info(f"Playing audio: {url}")
                             vc.play(discord.FFmpegPCMAudio(url))
+                            logger.info("Audio playback started")
             else:
-                print(data.voice_channel)
-                print('channel is none')
+                logger.warning(f"Voice channel not found: {data.voice_channel}")
         else:
-            print(f'cannot find a voice channel at {guild_id}')
+            logger.warning(f"Cannot find voice channel for guild_id: {guild_id}")
     
     @commands.command(aliases=['mo'])
     async def monitoring(self, ctx):
@@ -120,34 +131,66 @@ class Voice(commands.Cog):
         await ctx.channel.send(res, delete_after=30)
     
     async def reaction_method(self, message, user, emoji):
-        print("reaction_method has called.")
+        if user is None:
+            logger.warning(f"reaction_method called but user is None: emoji={emoji.name if emoji else 'None'}, message_id={message.id}")
+            return
+        if emoji is None:
+            logger.warning(f"reaction_method called but emoji is None: user={user.name if user else 'None'}, message_id={message.id}")
+            return
+        logger.info(f"reaction_method called: emoji={emoji.name}, user={user.name}, message_id={message.id}")
         if emoji.name == '▶️':
             text = message.content
             if embeds := message.embeds:
                 text = embeds[0].title
             text = re.sub(r'<.*?>', '', text)
+            logger.info(f"Extracted text: {text[:100]}...")
             if text:
                 # if re.search(r"[a-zA-Z]", text[0]):
-                ld = langdetect.detect(text).upper()[-2:]
-                print(ld)
+                try:
+                    ld = langdetect.detect(text).upper()[-2:]
+                    logger.info(f"Detected language: {ld}")
+                except Exception as e:
+                    logger.error(f"Language detection failed: {e}")
+                    ld = "UNKNOWN"
+                
                 if ld != "JA" and ld != "CH" and ld != "KO" and ld != "ZW":
+                    logger.info(f"Non-Japanese text detected ({ld}), using Weblio")
                     wbl = weblio.Weblio(text, message.id)
-                    print(wbl.get_audio())
-                    await self.play(wbl.get_audio(), message.guild.id)
+                    audio_file = wbl.get_audio()
+                    logger.info(f"Weblio audio file: {audio_file}")
+                    await self.play(audio_file, message.guild.id)
                 else:
+                    logger.info(f"Japanese text detected ({ld}), using OpenJTalk")
                     text = re.sub(r'<.*?>', '', text)
-                    print(text)
+                    logger.info(f"Processing text: {text[:100]}...")
                     if len(text) > 256:
                         text = text[:255]
+                        logger.info(f"Text truncated to 255 characters")
                     try:
                         msg_id = str(message.id)
                         msg_aid = str(message.author.id)
-                        if self.user_voices[msg_aid]['voice'] in [x.name for x in openjtalk.Openjtalk.VOICE]:
-                            voice = openjtalk.Openjtalk.VOICE[self.user_voices[msg_aid]['voice']]
+                        logger.info(f"Message ID: {msg_id}, Author ID: {msg_aid}")
+                        logger.info(f"User voices keys: {list(self.user_voices.keys())}")
+                        
+                        if msg_aid not in self.user_voices.keys():
+                            logger.warning(f"User {msg_aid} not in user_voices, using default")
+                            self._selfvoicedefault(msg_aid)
+                        
+                        voice_name = self.user_voices[msg_aid]['voice']
+                        logger.info(f"Selected voice: {voice_name}")
+                        
+                        if voice_name in [x.name for x in openjtalk.Openjtalk.VOICE]:
+                            voice = openjtalk.Openjtalk.VOICE[voice_name]
+                            logger.info(f"Using OpenJTalk VOICE: {voice_name}")
                         else:
-                            voice = openjtalk.Openjtalk.VOICEVOX[self.user_voices[msg_aid]['voice']]
+                            voice = openjtalk.Openjtalk.VOICEVOX[voice_name]
+                            logger.info(f"Using OpenJTalk VOICEVOX: {voice_name}")
+                        
                         oj = openjtalk.Openjtalk(text=text.replace('\n', ';'), name=msg_id)
+                        logger.info(f"OpenJTalk instance created")
+                        
                         if msg_aid in self.user_voices.keys():
+                            logger.info(f"Setting voice parameters: pass={self.user_voices[msg_aid]['pass']}, speed={self.user_voices[msg_aid]['speed']}, volume={self.user_voices[msg_aid]['volume']}, pitch={self.user_voices[msg_aid]['pitch']}, intonation_scale={self.user_voices[msg_aid]['intonation_scale']}")
                             oj.set_voice(
                                 voice=voice,\
                                 all_pass=self.user_voices[msg_aid]['pass'],\
@@ -156,9 +199,13 @@ class Voice(commands.Cog):
                                 pitch=self.user_voices[msg_aid]['pitch'],\
                                 intonation_scale=self.user_voices[msg_aid]['intonation_scale']
                                 )
-                        await self.play(oj.get_mp3(), message.guild.id)
+                        
+                        mp3_file = oj.get_mp3()
+                        logger.info(f"Generated MP3 file: {mp3_file}")
+                        await self.play(mp3_file, message.guild.id)
+                        logger.info(f"Play command sent for {mp3_file}")
                     except Exception as e:
-                        print(e)
+                        logger.error(f"Error in Japanese text processing: {type(e).__name__}: {e}", exc_info=True)
         elif emoji.name == '🤷':
             text = message.content
             if embeds := message.embeds:
@@ -208,17 +255,59 @@ class Voice(commands.Cog):
 
     @commands.Cog.listener(name='on_raw_reaction_add')
     async def on_reaction_add_weblio(self, payload:discord.RawReactionActionEvent):
-        channel = self.bot.get_channel(payload.channel_id)
-        message = await channel.fetch_message(payload.message_id)
-        user = self.bot.get_user(payload.user_id)
-        await self.reaction_method(message, user, payload.emoji)
+        emoji_name = payload.emoji.name if payload.emoji else str(payload.emoji)
+        logger.info(f"Reaction added: emoji={emoji_name}, user_id={payload.user_id}, message_id={payload.message_id}")
+        if payload.user_id == self.bot.user.id:
+            logger.debug("Ignoring reaction from bot itself")
+            return
+        try:
+            channel = self.bot.get_channel(payload.channel_id)
+            if channel is None:
+                logger.warning(f"Channel not found: {payload.channel_id}")
+                return
+            message = await channel.fetch_message(payload.message_id)
+            if message is None:
+                logger.warning(f"Message not found: {payload.message_id}")
+                return
+            user = self.bot.get_user(payload.user_id)
+            if user is None:
+                try:
+                    user = await self.bot.fetch_user(payload.user_id)
+                    logger.info(f"Fetched user: {user.name} (ID: {user.id})")
+                except Exception as e:
+                    logger.error(f"Failed to fetch user {payload.user_id}: {e}")
+                    return
+            await self.reaction_method(message, user, payload.emoji)
+        except Exception as e:
+            logger.error(f"Error in on_reaction_add_weblio: {type(e).__name__}: {e}", exc_info=True)
     
     @commands.Cog.listener(name='on_raw_reaction_remove')
     async def on_reaction_remove_weblio(self, payload:discord.RawReactionActionEvent):
-        channel = self.bot.get_channel(payload.channel_id)
-        message = await channel.fetch_message(payload.message_id)
-        user = self.bot.get_user(payload.user_id)
-        await self.reaction_method(message, user, payload.emoji)
+        emoji_name = payload.emoji.name if payload.emoji else str(payload.emoji)
+        logger.info(f"Reaction removed: emoji={emoji_name}, user_id={payload.user_id}, message_id={payload.message_id}")
+        if payload.user_id == self.bot.user.id:
+            logger.debug("Ignoring reaction removal from bot itself")
+            return
+        try:
+            channel = self.bot.get_channel(payload.channel_id)
+            if channel is None:
+                logger.warning(f"Channel not found: {payload.channel_id}")
+                return
+            message = await channel.fetch_message(payload.message_id)
+            if message is None:
+                logger.warning(f"Message not found: {payload.message_id}")
+                return
+            user = self.bot.get_user(payload.user_id)
+            if user is None:
+                try:
+                    user = await self.bot.fetch_user(payload.user_id)
+                    logger.info(f"Fetched user: {user.name} (ID: {user.id})")
+                except Exception as e:
+                    logger.error(f"Failed to fetch user {payload.user_id}: {e}")
+                    return
+            await self.reaction_method(message, user, payload.emoji)
+        except Exception as e:
+            logger.error(f"Error in on_reaction_remove_weblio: {type(e).__name__}: {e}", exc_info=True)
     
     @commands.command(name='dictionary',aliases=['dict'])
     async def add_dictionary(self, ctx, surface, pronounce, accent_type = None):
@@ -233,14 +322,21 @@ class Voice(commands.Cog):
         self._setvoicesettings()
 
     def _getvoicesettings(self):
-        with open(SETTING_FILE, mode='r') as f:
-            data=json.load(f)
+        try:
+            with open(SETTING_FILE, mode='r') as f:
+                data=json.load(f)
+        except FileNotFoundError:
+            # 設定ファイルが存在しない場合は空の辞書を返す
+            data = {}
         return data
     
     def _setvoicesettings(self):
         data = self.user_voices
+        # ディレクトリが存在しない場合は作成
+        os.makedirs(os.path.dirname(SETTING_FILE), exist_ok=True)
         with open(SETTING_FILE, mode='w') as f:
-            f.write(json.dumps(data))
+            f.write(json.dumps(data, ensure_ascii=False, indent=2))
+        logger.info(f"Voice settings saved to {SETTING_FILE}")
     
     @classmethod
     def param_normalize(cls, param, min_, max_, lower_=-1.0, upper_=1.0):

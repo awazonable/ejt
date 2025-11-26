@@ -8,7 +8,10 @@ if __name__ == '__main__':
 else:
     from openjtalk import voicevox
 
-WORK_DIR = r"/app/"
+# ローカル環境用のパス（Docker環境では/app/）
+# openjtalk.py から見て、appディレクトリを指す
+# app/openjtalk/openjtalk.py -> app/openjtalk -> app
+WORK_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '')
 
 class Openjtalk():
     ADDR_BIN = r"open_jtalk"

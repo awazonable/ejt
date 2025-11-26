@@ -23,6 +23,8 @@ class Weblio():
         self.id = msg_id
         self.raw_word = msg
         self.word = self.space_to_plus(msg)
+        # ディレクトリが存在しない場合は作成
+        os.makedirs(DOWNLOAD_SAVE_DIR, exist_ok=True)
         self.filepath_mp3 = DOWNLOAD_SAVE_DIR + str(msg_id) + '.mp3'
         self.filepath_wav = DOWNLOAD_SAVE_DIR + str(msg_id) + '.wav'
 
@@ -69,6 +71,8 @@ class Weblio():
             print(e)
 
         if req.headers['Content-Type'] == content_type:
+            # ディレクトリが存在しない場合は作成
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
             with open(filepath, 'wb') as file:
                 file.write(req.content)
             return True
